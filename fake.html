@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -10,6 +11,64 @@
     <link rel="stylesheet" href="./fx_files/weuix.css">
     <link rel="stylesheet" href="./fx_files/fx.css">
     <script type="text/javascript">
+        // set cookie for convenience
+        function setCookie(name, id, institute) {
+            // set expire to 7 days later
+            var date = new Date();
+            date.setTime(date.getTime() + (7*24*60*60*1000));
+
+            document.cookie = "name=" + encodeURIComponent(name);
+            document.cookie = "id=" + encodeURIComponent(id);
+            document.cookie = "institute=" + encodeURIComponent(institute);
+            document.cookie = "expires=" + date.toUTCString();
+        }
+
+        function updateCookie() {
+            var nameHolder = document.getElementById("name")
+            var idHolder = document.getElementById('id')
+            var instituteHolder = document.getElementById('institute')
+
+            setCookie(nameHolder.innerHTML, idHolder.innerHTML, instituteHolder.innerHTML)
+        }
+
+        // another random function from the internet
+        function getCookie(name) {
+            let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        // load data from cookie
+        function getSavedData() {
+            var items = document.cookie.split(';')
+            var name = getCookie('name')
+            var id = getCookie('id')
+            var institute = getCookie('institute')
+
+            if(name === undefined || id === undefined || institute === undefined) {
+                console.log("Cookie not found.")
+                return false
+            } else {
+                return [name, id, institute]
+            }
+        }
+
+        // deletes all cookies, for debug purposes
+        function throwCookies() {
+            document.cookie = 'max-age=0'
+        }
+
+        // random string function copied from StackOverflow
+        function generateId(length) {
+            var result           = '';
+            var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for ( var i = 0; i < length; i++ ) {
+                result += characters.charAt(Math.floor(Math.random() * 
+                charactersLength));
+            }
+            return result;
+        }
+
         //得到时间并写入div
         function getDate(){
             //获取当前时间
@@ -23,6 +82,47 @@
         }
         //使用定时器每秒向div写入当前时间
         setInterval("getDate()",1000);
+
+        // set personal info and else
+        window.onload = function () {
+            var dataFromCookie = getSavedData()
+            var name = ''
+            var id = ''
+            var institute = ''
+
+            if (dataFromCookie == false) {
+                name = prompt("请输入姓名", "马克思")
+                id = prompt("请输入学号", "1000000001")
+                institute = prompt("请输入所在学院", "家里蹲学院")
+
+                setCookie(name, id, institute)
+            } else {
+                name = dataFromCookie[0]
+                id = dataFromCookie[1]
+                institute = dataFromCookie[2]
+            }
+
+            var nameHolder = document.getElementById("name")
+            var idHolder = document.getElementById('id')
+            var instituteHolder = document.getElementById('institute')
+            var rCodeHolder = document.getElementById('randomCode')
+            var mCodeHolder = document.getElementById('mysteriousCode')
+
+            nameHolder.innerHTML = name
+            idHolder.innerHTML = id
+            instituteHolder.innerHTML = institute
+
+            // Probably useless because no one actually verfies it
+            rCodeHolder.innerHTML = "随机码：" + generateId(6)
+
+            // register onclick event
+            nameHolder.onclick = function() { nameHolder.innerHTML = prompt("请输入姓名", "马克思") ?? "马克思"; updateCookie() }
+            idHolder.onclick = function() { idHolder.innerHTML = prompt("请输入学号", "1000000001") ?? "1000000001"; updateCookie() }
+            instituteHolder.onclick = function() { instituteHolder.innerHTML = prompt("请输入所在学院", "家里蹲学院") ?? "家里蹲学院"; updateCookie() }
+
+            mCodeHolder.onclick = function() { mCodeHolder.innerHTML = prompt("请输入神秘代码", "1374") ?? "1374" }
+            rCodeHolder.onclick = function() { rCodeHolder.innerHTML = "随机码：" + generateId(6) }
+        }
     </script>
     <script src="./fx_files/safe.js"></script>
     <style>
@@ -97,11 +197,11 @@
     <div class="page-hd cl1">
     </div>
     <div class="page-hd cl2">
-        <p style="font-size: 30px; font-family: STHeiti; font-weight: bold;" align="center">马克思</p>
+        <p id="name" style="font-size: 30px; font-family: STHeiti; font-weight: bold;" align="center">马克思</p>
     </div>
     <div class="page-hd cl3" style=" text-align: center;float:none;">
-        <p style="font-size: 20px; text-align:center;">2022学号1984</p>
-        <p style="font-size: 16px; text-align:center;">鬼知道什么学院</p>
+        <p id='id' style="font-size: 20px; text-align:center;">2022学号1984</p>
+        <p id='institute' style="font-size: 16px; text-align:center;">鬼知道什么学院</p>
         <p style="font-size: 16px; text-align:center;">
         </p>
         <div id="qr" class="tcenter" style="padding: 10px;height:170px;">
@@ -116,8 +216,13 @@
     <div class="page-hd cl4">
         <p style="font-size: 20px; font-weight:bold;" align="center"><span id='times'></span></p>
     </div>
+    <div class="page-hd cl5">
+        <p id="mysteriousCode" style="font-size: 20px; font-weight:bold;text-align: center; margin-top: -30px;">           
+        </p>
+    </div>  
             <div id="colorDIV" class="page-hd cl6 cl6_blue" permit="blue">        
                 <p style=" color:#fff;   font-size: 25px;  font-weight: 200;" align="center" class="bUtonadaLij">予以通行</p>
+                
             </div>
 
 
